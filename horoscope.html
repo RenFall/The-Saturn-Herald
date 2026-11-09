@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Вестник Сатурна — ежедневный ироничный гороскоп. Пророчество дня для вашего знака зодиака." />
+  <meta name="theme-color" content="#f6f1e8" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23b4552a'%20d='M12%202c.9%205.4%202.9%207.4%208.3%208.3-5.4.9-7.4%202.9-8.3%208.3-.9-5.4-2.9-7.4-8.3-8.3%205.4-.9%207.4-2.9%208.3-8.3Z'/%3E%3C/svg%3E" />
+  <title>Вестник Сатурна — Гороскоп</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --bg-soft: #ebe4d6;
+      --surface: #fffdf8;
+      --ink: #262019;
+      --text: #3d372b;
+      --muted: #6e6656;
+      --faint: #9a9180;
+      --border: #e6dfd0;
+      --border-strong: #d3c9b4;
+      --accent: #b4552a;
+      --accent-bright: #d97746;
+      --accent-soft: rgba(180, 85, 42, 0.09);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(1100px 540px at 8% -10%, rgba(217, 119, 70, 0.13), transparent 60%),
+        radial-gradient(950px 500px at 106% 10%, rgba(118, 142, 181, 0.12), transparent 55%),
+        radial-gradient(1000px 600px at 50% 118%, rgba(217, 119, 70, 0.08), transparent 62%),
+        var(--bg);
+      background-attachment: fixed;
+    }
+
+    ::selection { background: rgba(217, 119, 70, 0.28); }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(20px, 4vw, 48px);
+    }
+
+    /* ── Шапка газетного типа ─────────────────────────────── */
+    .masthead {
+      text-align: center;
+      padding-bottom: 22px;
+      border-bottom: 3px double rgba(38, 32, 25, 0.45);
+    }
+
+    .masthead-eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .masthead-eyebrow svg { width: 11px; height: 11px; color: var(--accent-bright); flex: none; }
+
+    .masthead-title {
+      margin-top: 14px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.9rem, 5.2vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .dateline {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: baseline;
+      column-gap: 12px;
+      row-gap: 4px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .dateline .issue {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .dateline .dot { color: var(--accent-bright); }
+    #date-display { letter-spacing: 0.02em; }
+
+    /* ── Сетка знаков зодиака ─────────────────────────────── */
+    .signs-nav { margin-top: 26px; }
+
+    .signs-caption {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin-bottom: 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .signs-caption .legend {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: var(--faint);
+    }
+    .sun-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.18);
+      flex: none;
+    }
+
+    .signs-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 8px;
+      padding: 4px 0 6px;
+    }
+
+    .sign-chip {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 4px 11px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(38, 32, 25, 0.05);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease,
+                  color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .sign-chip svg {
+      width: 26px;
+      height: 26px;
+      flex: none;
+      color: var(--faint);
+      transition: color 0.18s ease, transform 0.25s ease;
+    }
+
+    .sign-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.1;
+      color: var(--text);
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sign-range {
+      font-size: 0.64rem;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      color: var(--faint);
+      white-space: nowrap;
+    }
+
+    .sign-chip.is-sun::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.18);
+    }
+
+    .sign-chip:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+      box-shadow: 0 10px 18px -10px rgba(38, 32, 25, 0.25);
+    }
+    .sign-chip:hover svg { color: var(--accent-bright); transform: rotate(-8deg) scale(1.1); }
+    .sign-chip:active { transform: translateY(0) scale(0.97); }
+
+    .sign-chip.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      box-shadow: 0 14px 26px -12px rgba(38, 32, 25, 0.6);
+    }
+    .sign-chip.active .sign-name { color: #f6f1e8; }
+    .sign-chip.active .sign-range { color: rgba(246, 241, 232, 0.6); }
+    .sign-chip.active svg { color: var(--accent-bright); }
+
+    .sign-chip:focus-visible,
+    .reroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* ── Основное чтение ──────────────────────────────────── */
+    .reading {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: clamp(28px, 5vh, 52px) 0;
+      text-align: center;
+    }
+
+    .reading-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px 14px;
+    }
+
+    .sign-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      border: 1px solid rgba(180, 85, 42, 0.22);
+      color: var(--accent);
+    }
+    .sign-badge svg { width: 24px; height: 24px; }
+
+    .sign-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .sign-dates { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.04em; }
+    .sign-dates::before { content: "·"; margin: 0 10px 0 2px; color: var(--faint); }
+
+    .mode-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .mode-label::before,
+    .mode-label::after { content: ""; width: 34px; height: 1px; flex: none; }
+    .mode-label::before { background: linear-gradient(90deg, transparent, var(--border-strong)); }
+    .mode-label::after { background: linear-gradient(90deg, var(--border-strong), transparent); }
+
+    .prophecy-card {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: clamp(30px, 6vw, 60px) clamp(22px, 5vw, 56px);
+      box-shadow: 0 1px 2px rgba(38, 32, 25, 0.05), 0 18px 44px -22px rgba(38, 32, 25, 0.22);
+    }
+    .prophecy-card::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      pointer-events: none;
+    }
+
+    .prophecy-ornament { display: flex; justify-content: center; margin-bottom: 16px; color: var(--accent-bright); }
+    .prophecy-ornament svg { width: 22px; height: 22px; opacity: 0.9; }
+
+    .prophecy-quote {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.3rem, 2.6vw, 2.05rem);
+      line-height: 1.45;
+      color: var(--ink);
+      text-wrap: balance;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .prophecy-quote.fading { opacity: 0; transform: translateY(10px) scale(0.995); }
+
+    /* ── Нижняя панель ────────────────────────────────────── */
+    .panel {
+      border-top: 3px double rgba(38, 32, 25, 0.3);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 22px 24px;
+    }
+
+    .stats { display: flex; flex-wrap: wrap; gap: 18px clamp(18px, 2.5vw, 30px); }
+
+    .stat { display: flex; flex-direction: column; gap: 7px; min-width: 128px; }
+
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--muted);
+    }
+
+    .stat-value { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+
+    .stat-bar {
+      width: 132px;
+      max-width: 100%;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--bg-soft);
+      overflow: hidden;
+    }
+    .stat-bar-fill {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent-bright), var(--accent));
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reroll {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(140deg, #c9683a, #a94a20);
+      color: #fff8f0;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(169, 74, 32, 0.28), 0 14px 30px -12px rgba(169, 74, 32, 0.5);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+    .reroll svg { width: 17px; height: 17px; flex: none; transition: transform 0.3s ease; }
+    .reroll:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(169, 74, 32, 0.3), 0 20px 38px -12px rgba(169, 74, 32, 0.55);
+      filter: saturate(1.06);
+    }
+    .reroll:hover svg { transform: rotate(-10deg) scale(1.1); }
+    .reroll:active { transform: translateY(0) scale(0.985); }
+
+    .actions { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-left: auto; }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+                  background-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .copy-btn svg { width: 16px; height: 16px; flex: none; }
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--faint);
+      box-shadow: 0 6px 14px -6px rgba(38, 32, 25, 0.2);
+    }
+    .copy-btn:active { transform: translateY(0) scale(0.985); }
+    .copy-btn.done {
+      border-color: rgba(180, 85, 42, 0.45);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .colophon {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--faint);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Появление при загрузке ───────────────────────────── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { opacity: 0; animation: rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .reveal-2 { animation-delay: 0.07s; }
+    .reveal-3 { animation-delay: 0.14s; }
+    .reveal-4 { animation-delay: 0.21s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { animation: none; opacity: 1; transform: none; }
+      .prophecy-quote { transition: none; }
+      .stat-bar-fill { transition: none; }
+    }
+
+    /* ── Адаптив ──────────────────────────────────────────── */
+    @media (max-width: 1040px) {
+      .signs-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    }
+    @media (max-width: 560px) {
+      .signs-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+      .sign-chip { padding: 12px 2px 9px; }
+      .sign-chip svg { width: 24px; height: 24px; }
+      .sign-name { font-size: 0.78rem; }
+    }
+    @media (max-width: 720px) {
+      .panel { flex-direction: column; align-items: stretch; }
+      .stats { justify-content: space-between; gap: 16px; }
+      .stat { min-width: 0; flex: 1; }
+      .stat-bar { width: 100%; }
+      .sign-badge { width: 40px; height: 40px; }
+      .sign-badge svg { width: 20px; height: 20px; }
+      .sign-dates { flex-basis: 100%; }
+      .sign-dates::before { content: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Шапка -->
+    <header class="masthead reveal">
+      <div class="masthead-eyebrow">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.9 5.4 2.9 7.4 8.3 8.3-5.4.9-7.4 2.9-8.3 8.3-.9-5.4-2.9-7.4-8.3-8.3 5.4-.9 7.4-2.9 8.3-8.3Z"/></svg>
+        <span>Ежедневный астрологический вестник</span>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.9 5.4 2.9 7.4 8.3 8.3-5.4.9-7.4 2.9-8.3 8.3-.9-5.4-2.9-7.4-8.3-8.3 5.4-.9 7.4-2.9 8.3-8.3Z"/></svg>
+      </div>
+      <h1 class="masthead-title">Вестник Сатурна</h1>
+      <div class="dateline">
+        <span class="issue">Выпуск № <span id="issue-number">…</span></span>
+        <span class="dot" aria-hidden="true">•</span>
+        <span id="date-display">Загрузка даты…</span>
+        <span class="dot" aria-hidden="true">•</span>
+        <span id="sun-position">Сверяем эфемериды…</span>
+      </div>
+    </header>
+
+    <!-- Выбор знака зодиака -->
+    <nav class="signs-nav reveal reveal-2" aria-label="Выбор знака зодиака">
+      <div class="signs-caption">
+        <span id="signs-label">Выберите ваш знак</span>
+        <span class="legend"><span class="sun-dot" aria-hidden="true"></span>Солнце сейчас здесь</span>
+      </div>
+      <div class="signs-grid" id="signs-strip" role="radiogroup" aria-labelledby="signs-label"></div>
+    </nav>
+
+    <!-- Основное поле предсказания -->
+    <main class="reading reveal reveal-3">
+      <div class="reading-head">
+        <span class="sign-badge" id="active-sign-glyph" aria-hidden="true"></span>
+        <h2 class="sign-title" id="active-sign-title">Овен</h2>
+        <span class="sign-dates" id="active-sign-dates"></span>
+      </div>
+      <div class="mode-label"><span id="reading-mode">Основной прогноз дня</span></div>
+      <figure class="prophecy-card">
+        <div class="prophecy-ornament" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+        </div>
+        <blockquote class="prophecy-quote fading" id="prophecy-text" aria-live="polite">
+          Считывание астральных помех…
+        </blockquote>
+      </figure>
+    </main>
+
+    <!-- Футер с метаданными и кнопкой -->
+    <footer class="panel reveal reveal-4">
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Индекс тревожности</span>
+          <span class="stat-value" id="anxiety-value">—</span>
+          <span class="stat-bar" aria-hidden="true"><span class="stat-bar-fill" id="anxiety-bar"></span></span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Артефакт дня</span>
+          <span class="stat-value" id="totem-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Состояние матрицы</span>
+          <span class="stat-value" id="matrix-value">—</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="reroll" id="reroll-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+          <span>Дополнительное пророчество</span>
+        </button>
+        <button class="copy-btn" id="copy-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <span id="copy-label">Скопировать выпуск</span>
+        </button>
+      </div>
+    </footer>
+
+    <p class="colophon">Все совпадения с вашей судьбой случайны · Пророчества не являются финансовой рекомендацией</p>
+
+  </div>
+
+  <script>
+    // ── Иконки знаков зодиака (Tabler Icons, MIT) ──────────────
+    const ICONS = {
+      aries: '<path d="M12 5a5 5 0 1 0 -4 8"/><path d="M16 13a5 5 0 1 0 -4 -8"/><path d="M12 21l0 -16"/>',
+      taurus: '<path d="M6 3a6 6 0 0 0 12 0"/><path d="M12 15m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"/>',
+      gemini: '<path d="M3 3a21 21 0 0 0 18 0"/><path d="M3 21a21 21 0 0 1 18 0"/><path d="M7 4.5l0 15"/><path d="M17 4.5l0 15"/>',
+      cancer: '<path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M18 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M3 12a10 6.5 0 0 1 14 -6.5"/><path d="M21 12a10 6.5 0 0 1 -14 6.5"/>',
+      leo: '<path d="M13 17a4 4 0 1 0 8 0"/><path d="M6 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M11 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M7 7c0 3 2 5 2 9"/><path d="M15 7c0 4 -2 6 -2 10"/>',
+      virgo: '<path d="M3 4a2 2 0 0 1 2 2v9"/><path d="M5 6a2 2 0 0 1 4 0v9"/><path d="M9 6a2 2 0 0 1 4 0v10a7 5 0 0 0 7 5"/><path d="M12 21a7 5 0 0 0 7 -5v-2a3 3 0 0 0 -6 0"/>',
+      libra: '<path d="M5 20l14 0"/><path d="M5 17h5v-.3a7 7 0 1 1 4 0v.3h5"/>',
+      scorpio: '<path d="M3 4a2 2 0 0 1 2 2v9"/><path d="M5 6a2 2 0 0 1 4 0v9"/><path d="M9 6a2 2 0 0 1 4 0v10a3 3 0 0 0 3 3h5l-3 -3m0 6l3 -3"/>',
+      sagittarius: '<path d="M4 20l16 -16"/><path d="M13 4h7v7"/><path d="M6.5 12.5l5 5"/>',
+      capricorn: '<path d="M4 4a3 3 0 0 1 3 3v9"/><path d="M7 7a3 3 0 0 1 6 0v11a3 3 0 0 1 -3 3"/><path d="M16 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>',
+      aquarius: '<path d="M3 10l3 -3l3 3l3 -3l3 3l3 -3l3 3"/><path d="M3 17l3 -3l3 3l3 -3l3 3l3 -3l3 3"/>',
+      pisces: '<path d="M5 3a21 21 0 0 1 0 18"/><path d="M19 3a21 21 0 0 0 0 18"/><path d="M5 12l14 0"/>'
+    };
+
+    function svgWrap(inner) {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + inner + '</svg>';
+    }
+
+    // ── Данные знаков ──────────────────────────────────────────
+    const SIGNS = [
+      { name: "Овен", short: "21.03 – 19.04", dates: "21 марта — 19 апреля", key: "aries" },
+      { name: "Телец", short: "20.04 – 20.05", dates: "20 апреля — 20 мая", key: "taurus" },
+      { name: "Близнецы", short: "21.05 – 20.06", dates: "21 мая — 20 июня", key: "gemini" },
+      { name: "Рак", short: "21.06 – 22.07", dates: "21 июня — 22 июля", key: "cancer" },
+      { name: "Лев", short: "23.07 – 22.08", dates: "23 июля — 22 августа", key: "leo" },
+      { name: "Дева", short: "23.08 – 22.09", dates: "23 августа — 22 сентября", key: "virgo" },
+      { name: "Весы", short: "23.09 – 22.10", dates: "23 сентября — 22 октября", key: "libra" },
+      { name: "Скорпион", short: "23.10 – 21.11", dates: "23 октября — 21 ноября", key: "scorpio" },
+      { name: "Стрелец", short: "22.11 – 21.12", dates: "22 ноября — 21 декабря", key: "sagittarius" },
+      { name: "Козерог", short: "22.12 – 19.01", dates: "22 декабря — 19 января", key: "capricorn" },
+      { name: "Водолей", short: "20.01 – 18.02", dates: "20 января — 18 февраля", key: "aquarius" },
+      { name: "Рыбы", short: "19.02 – 20.03", dates: "19 февраля — 20 марта", key: "pisces" }
+    ];
+
+    // ТЕКСТОВЫЙ КОРПУС ДЛЯ ЦЕПЕЙ МАРКОВА
+    const CORPUS = [
+      "Сегодня звезды советуют выпить айс латте на овсяном молоке и не вступать в диалог с миром.",
+      "Сегодня звезды категорически запрещают спорить с зумерами в комментариях под чужими рилсами.",
+      "Сегодня ваш психотерапевт советует закрыть гештальт и навсегда удалить рабочий чат в Telegram.",
+      "Сегодня ваш внутренний ребенок требует заказать вредную еду и включить инди-рок 2007 года.",
+      "Вселенная требует закрыть ипотеку и сделать вид что это был ваш осознанный жизненный выбор.",
+      "Вселенная рекомендует купить очередную ароматическую свечу и завернуться в утяжеленное одеяло.",
+      "Вселенная намекает на хроническое выгорание поэтому заварите ромашковый чай и притворитесь мебелью.",
+      "Ретроградный Меркурий залез в домашний роутер и настойчиво требует пересмотреть жизненные приоритеты.",
+      "Ретроградный Меркурий вошел в оппозицию к вашей осанке поэтому спина будет предательски ныть.",
+      "Ретроградный Меркурий советует лечь на коврик для йоги и не шевелиться до конца рабочей недели.",
+      "Сатурн вошел в дом экзистенциального кринжа поэтому пора пересадить монстеру и лечь спать до полуночи.",
+      "Сатурн требует сдать развернутый анализ на ферритин и перестать романтизировать простуду.",
+      "Астральный ЖЭК перепутал ваши чакры с дедлайнами по проекту и временно отключил выработку серотонина.",
+      "Астральный ЖЭК советует выпить двойную дозу магния B6 и не отвечать на звонки с незнакомых номеров.",
+      "Ваша тревожность синхронизировалась с курсом биткоина и требует свежий миндальный круассан.",
+      "Ваша тревожность советует проигнорировать пять входящих звонков ради сохранения ментального здоровья.",
+      "Космический совет дня если реальность дает трещину скажите терапевту что это постирония и метамодерн.",
+      "Космический совет дня закажите доставку комфорт плюс и молча вслушайтесь в хруст теплого багета.",
+      "Если коленный сустав хрустит при подъеме по лестнице космос прямо намекает на ортопедические стельки.",
+      "Марс в пятом доме обещает внезапное желание удалить все социальные сети и снять домик в глухом лесу.",
+      "Сегодня Меркурий в соединении с вашим будильником поэтому первый кофе официально считается завтраком.",
+      "Звезды советуют отвечать на рабочие сообщения голосовыми и наблюдать как коллеги учатся терпению.",
+      "Ваша горловая чакра переполнена неотправленными сообщениями поэтому разрешите себе закрыть мессенджер до вечера.",
+      "Луна в доме бытовых дел намекает что пылесос под кроватью тоже заслуживает вашего внимания.",
+      "Юпитер щедр сегодня поэтому второй десерт калорийно не считается и это официально подтверждено космосом.",
+      "Сегодня хороший день чтобы начать новую книгу и остановиться на двадцатой странице с чистой совестью.",
+      "Венера покровительствует доставке поэтому десерт заказанный до шести вечера не содержит калорий вовсе.",
+      "Плутон трансформирует ваш гардероб поэтому черный худи снова является правильным стилистическим решением.",
+      
+    ];
+
+    const TOTEMS = [
+      "Матча-тоник на кокосовом", "Анатомическая подушка", "Магний B6 в ампулах",
+      "Свеча с нотами дубового мха", "Шумоподавляющие наушники", "МФР-валик для спины",
+      "Витамин D3 5000 IU", "Массажер для шеи", "Чай с ромашкой", "Увлажнитель воздуха",
+      "Бутылка минералки с газом для заземления", "Сертификат на «ничегонеделание»", 
+      "Блютуз-колонка для аффирмаций", "Набор для выживания в опенспейсе", 
+      "Электронная книга с пустой библиотекой", "Очки с синим фильтром и розовыми стеклами",
+      "Дневник благодарности с замком", "Коврик для медитации с подогревом",
+      "Глицин под язык", "Термос с облепиховым чаем", "Массажный пистолет", "Плед с рукавами"
+
+    ];
+
+    // Предложный падеж для «Солнце в …»
+    const SIGN_PREP = [
+      "Овне", "Тельце", "Близнецах", "Раке", "Льве", "Деве",
+      "Весах", "Скорпионе", "Стрельце", "Козероге", "Водолее", "Рыбах"
+    ];
+
+    const MATRIX = [
+      "Стабильное выгорание", "Тихий саботаж", "Рабочий шум", "Мягкий дрейф", "Плановое затмение",
+      "Режим энергосбережения души", "Токсичная продуктивность", "Осознанный пофигизм", 
+      "Духовный детокс от дедлайнов", "Астральная прокрастинация", "Мягкий коллапс"
+    ];
+
+    // Границы прохождения Солнца по знакам: [месяц (0-11), день, индекс знака]
+    const SUN_CUTS = [
+      [0, 20, 10], [1, 19, 11], [2, 21, 0], [3, 20, 1], [4, 21, 2], [5, 21, 3],
+      [6, 23, 4], [7, 23, 5], [8, 23, 6], [9, 23, 7], [10, 22, 8], [11, 22, 9]
+    ];
+
+    function sunSignIndex(date) {
+      const month = date.getMonth();
+      const day = date.getDate();
+      let index = 9; // до 20 января Солнце в Козероге
+      for (const cut of SUN_CUTS) {
+        if (month > cut[0] || (month === cut[0] && day >= cut[1])) index = cut[2];
+      }
+      return index;
+    }
+
+    function editionNumber(date) {
+      const start = Date.UTC(date.getFullYear(), 0, 0);
+      const current = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+      return 100 + Math.round((current - start) / 86400000);
+    }
+
+    const STORAGE_KEY = "saturn_user_sign";
+
+    // Псевдослучайный генератор с зерном для детерминизма по календарным дням
+    class SeededRNG {
+      constructor(seed) {
+        this.seed = seed % 2147483647;
+        if (this.seed <= 0) this.seed += 2147483646;
+      }
+      next() {
+        this.seed = (this.seed * 16807) % 2147483647;
+        return (this.seed - 1) / 2147483646;
+      }
+    }
+
+    // Марковская цепь 2-го порядка (биграммы)
+    class MarkovChain {
+      constructor(corpus) {
+        this.chain = new Map();
+        this.starts = [];
+        this.build(corpus);
+      }
+
+      build(corpus) {
+        for (const line of corpus) {
+          const words = line.trim().split(/\s+/);
+          if (words.length < 3) continue;
+
+          this.starts.push([words[0], words[1]]);
+
+          for (let i = 0; i < words.length - 2; i++) {
+            const key = words[i] + " " + words[i + 1];
+            const next = words[i + 2];
+
+            if (!this.chain.has(key)) {
+              this.chain.set(key, []);
+            }
+            this.chain.get(key).push(next);
+          }
+        }
+      }
+
+      generate(rng, minWords = 7, maxWords = 20) {
+        const startPair = this.starts[Math.floor(rng.next() * this.starts.length)];
+        const result = [startPair[0], startPair[1]];
+        let w1 = startPair[0];
+        let w2 = startPair[1];
+
+        for (let i = 0; i < maxWords; i++) {
+          const key = w1 + " " + w2;
+          const options = this.chain.get(key);
+          if (!options || options.length === 0) break;
+
+          const next = options[Math.floor(rng.next() * options.length)];
+          result.push(next);
+
+          if (result.length >= minWords && /[.!?]$/.test(next)) {
+            break;
+          }
+
+          w1 = w2;
+          w2 = next;
+        }
+
+        let sentence = result.join(" ");
+        // Не оставляем висячий союз или предлог в конце фразы
+        const FILLERS = new Set(["и", "а", "но", "или", "что", "на", "в", "с", "к", "по", "за", "из", "у", "о", "об", "не", "же", "то", "как", "для", "при", "под", "над", "от", "до"]);
+        while (result.length > minWords && FILLERS.has(result[result.length - 1].replace(/[.,!?]/g, "").toLowerCase())) {
+          result.pop();
+        }
+        sentence = result.join(" ");
+        if (!/[.!?]$/.test(sentence)) sentence += ".";
+        return sentence;
+      }
+    }
+
+    // Главный контроллер
+    class App {
+      constructor() {
+        this.markov = new MarkovChain(CORPUS);
+        this.activeSignIdx = 0;
+        this.extraCount = 0;
+        this.lastReading = null;
+        this.copyTimer = null;
+
+        this.loadSign();
+        this.renderDate();
+        this.renderSigns();
+        this.bindEvents();
+        this.renderDailyPrediction();
+      }
+
+      loadSign() {
+        let saved = null;
+        try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+        if (saved !== null) {
+          const idx = parseInt(saved, 10);
+          if (!isNaN(idx) && idx >= 0 && idx < SIGNS.length) {
+            this.activeSignIdx = idx;
+          }
+        }
+      }
+
+      renderDate() {
+        const now = new Date();
+        let s = now.toLocaleDateString("ru-RU", {
+          weekday: "long", day: "numeric", month: "long", year: "numeric"
+        });
+        s = s.replace(/\s*г\./, "");
+        s = s.charAt(0).toUpperCase() + s.slice(1);
+        document.getElementById("date-display").textContent = s;
+        document.getElementById("issue-number").textContent = editionNumber(now);
+        document.getElementById("sun-position").textContent =
+          "Солнце в " + SIGN_PREP[sunSignIndex(now)];
+      }
+
+      renderSigns() {
+        const container = document.getElementById("signs-strip");
+        const sunIdx = sunSignIndex(new Date());
+        container.innerHTML = "";
+        this.chips = SIGNS.map((sign, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "sign-chip" + (idx === sunIdx ? " is-sun" : "");
+          btn.setAttribute("role", "radio");
+          btn.setAttribute("aria-label", sign.name + ", " + sign.dates + (idx === sunIdx ? ", Солнце сейчас здесь" : ""));
+          btn.dataset.idx = idx;
+          btn.innerHTML = svgWrap(ICONS[sign.key]) +
+            '<span class="sign-name">' + sign.name + '</span>' +
+            '<span class="sign-range">' + sign.short + '</span>';
+          btn.onclick = () => this.selectSign(idx);
+          container.appendChild(btn);
+          return btn;
+        });
+        container.onkeydown = (e) => this.onSignKey(e);
+        this.syncChips();
+      }
+
+      syncChips() {
+        this.chips.forEach((btn, idx) => {
+          const on = idx === this.activeSignIdx;
+          btn.classList.toggle("active", on);
+          btn.setAttribute("aria-checked", on ? "true" : "false");
+          btn.tabIndex = on ? 0 : -1;
+        });
+      }
+
+      selectSign(idx, focus) {
+        if (this.activeSignIdx === idx) return;
+        this.activeSignIdx = idx;
+        this.extraCount = 0;
+        try { localStorage.setItem(STORAGE_KEY, String(idx)); } catch (e) {}
+        this.syncChips();
+        if (focus) this.chips[idx].focus();
+        this.renderDailyPrediction();
+      }
+
+      onSignKey(e) {
+        const n = SIGNS.length;
+        let next = null;
+        const cur = this.activeSignIdx;
+        const cols = getComputedStyle(e.currentTarget).gridTemplateColumns.split(" ").length || 1;
+        switch (e.key) {
+          case "ArrowRight": next = (cur + 1) % n; break;
+          case "ArrowLeft": next = (cur - 1 + n) % n; break;
+          case "ArrowDown": next = cur + cols < n ? cur + cols : cur; break;
+          case "ArrowUp": next = cur - cols >= 0 ? cur - cols : cur; break;
+          case "Home": next = 0; break;
+          case "End": next = n - 1; break;
+        }
+        if (next === null) return;
+        e.preventDefault();
+        this.selectSign(next, true);
+        this.chips[next].focus();
+      }
+
+      getDaySeed(offset = 0) {
+        const d = new Date();
+        const dateNum = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        return dateNum + (this.activeSignIdx * 4099) + (offset * 104729);
+      }
+
+      renderDailyPrediction() {
+        const rng = new SeededRNG(this.getDaySeed(0));
+        this.updateView(rng, "Основной прогноз дня");
+      }
+
+      renderExtraPrediction() {
+        this.extraCount++;
+        const rng = new SeededRNG(Date.now() + this.extraCount);
+        this.updateView(rng, "Внеплановое откровение №" + this.extraCount);
+      }
+
+      updateView(rng, modeText) {
+        const prophecyEl = document.getElementById("prophecy-text");
+
+        // Мягкая анимация смены текста
+        prophecyEl.classList.add("fading");
+
+        setTimeout(() => {
+          const sign = SIGNS[this.activeSignIdx];
+          const p1 = this.markov.generate(rng, 6, 12);
+          let p2 = this.markov.generate(rng, 6, 15);
+
+          // Не позволяем цепи Маркова дважды выдать одну и ту же фразу
+          const head = (s) => s.split(/\s+/).slice(0, 2).join(" ");
+          for (let attempt = 0; attempt < 5 && (p2 === p1 || head(p2) === head(p1)); attempt++) {
+            p2 = this.markov.generate(rng, 6, 15);
+          }
+
+          const anxiety = Math.floor(rng.next() * 32) + 68; // 68 - 99%
+          const totem = TOTEMS[Math.floor(rng.next() * TOTEMS.length)];
+          const matrix = MATRIX[Math.floor(rng.next() * MATRIX.length)];
+          this.lastReading = { lead: p1, follow: p2, anxiety: anxiety, totem: totem, matrix: matrix };
+
+          document.getElementById("active-sign-glyph").innerHTML = svgWrap(ICONS[sign.key]);
+          document.getElementById("active-sign-title").textContent = sign.name;
+          document.getElementById("active-sign-dates").textContent = sign.dates;
+          document.getElementById("reading-mode").textContent = modeText;
+          prophecyEl.textContent = p1 + " " + p2;
+          document.getElementById("anxiety-value").textContent = anxiety + "%";
+          document.getElementById("anxiety-bar").style.width = anxiety + "%";
+          document.getElementById("totem-value").textContent = totem;
+          document.getElementById("matrix-value").textContent = matrix;
+          document.title = sign.name + " — Вестник Сатурна";
+
+          prophecyEl.classList.remove("fading");
+        }, 180);
+      }
+
+      bindEvents() {
+        document.getElementById("reroll-btn").onclick = () => {
+          this.renderExtraPrediction();
+        };
+        document.getElementById("copy-btn").onclick = () => {
+          this.copyReading();
+        };
+      }
+
+      copyReading() {
+        const sign = SIGNS[this.activeSignIdx];
+        const r = this.lastReading;
+        if (!r) return;
+        const text = [
+          "Вестник Сатурна — " + sign.name,
+          r.lead,
+          r.follow,
+          "Тревожность " + r.anxiety + "% · Артефакт: " + r.totem,
+          "Состояние матрицы: " + r.matrix
+        ].join("\n");
+
+        const finish = (ok) => {
+          const btn = document.getElementById("copy-btn");
+          const label = document.getElementById("copy-label");
+          btn.classList.toggle("done", ok);
+          label.textContent = ok ? "Скопировано" : "Не получилось";
+          if (this.copyTimer !== null) clearTimeout(this.copyTimer);
+          this.copyTimer = setTimeout(() => {
+            btn.classList.remove("done");
+            label.textContent = "Скопировать выпуск";
+          }, 1600);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => finish(true)).catch(() => this.fallbackCopy(text, finish));
+        } else {
+          this.fallbackCopy(text, finish);
+        }
+      }
+
+      fallbackCopy(text, finish) {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          finish(ok);
+        } catch (e) {
+          finish(false);
+        }
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      new App();
+    });
+  </script>
+</body>
+</html>
